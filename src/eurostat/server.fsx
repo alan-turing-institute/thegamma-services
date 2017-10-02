@@ -56,11 +56,21 @@ let app =
       ])
     memberPath "/pickModule" (fun () ->
       let rootFolderData = "scitech" 
-      let scienceModules = Domain.getChildren(eurostatScience,rootFolderData)
+      let (scienceModules, scienceDatasets) = Domain.getChildren(eurostatScience,rootFolderData)
       // printfn "Science Modules: %A" scienceModules
-      [ for aModule in scienceModules ->
-          { name=aModule; returns={kind="nested"; endpoint="/amodule/pickModule"}
-            } ])
+      [ for (theme,code) in scienceModules ->
+          let endpointUri = sprintf "/%s/pickModule" code
+          { name=theme; returns={kind="nested"; endpoint=endpointUri}
+            trace=[| |]; schema = noSchema } ])
+
+    memberPathf "/%s/pickModule" (fun rootFolderData ->
+      let (scienceModules, sciencDatasets) = Domain.getChildren(eurostatScience,rootFolderData)
+      // printfn "Science Modules: %A" scienceModules
+      let modulesList = [ for (theme,code) in scienceModules ->
+                            let endpointUri = sprintf "/%s/pickModule" code
+                            { name=theme; returns={kind="nested"; endpoint=endpointUri}
+                              trace=[| |]; schema = noSchema } ]
+      modulesList)
     
 
     // path "/data" >=> request (fun r ->

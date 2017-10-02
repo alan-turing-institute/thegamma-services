@@ -104,7 +104,7 @@ module Tree =
       "Not found"                       
     else
       let (databaseByThemes, data, folder) = tokenizeLineContent(Seq.last potentialParents)
-      let numWhiteSpacesInParent = firstNonWhiteCharIndex databaseByThemes
+      // let numWhiteSpacesInParent = firstNonWhiteCharIndex databaseByThemes
       //printfn "Parent Name Selected: %s[%i] Child: [%i]" databaseByThemes numWhiteSpacesInParent numWhiteSpacesInChild
       data
                         
@@ -134,7 +134,7 @@ module Tree =
                         match folder with
                           | "dataset" -> let newDataset = {Title = databaseByThemes; Code=data}
                                          match parentCode with
-                                           | "Not found" -> //printfn "Database prefix not found: Adding Dataset [%s] to %s" data root.Data; 
+                                           | "Not found" -> printfn "Database prefix [%s] not found: Adding Dataset [%s] to %s" parentCode data root.Data; 
                                                             root.Datasets.Add(newDataset)  
                                            | _ -> let parentFolder = findFolder(root, parentCode)
                                                   match parentFolder.DatabaseByThemes with
@@ -146,11 +146,11 @@ module Tree =
                                           Folders=new List<Folder>(); 
                                           Datasets=new List<Dataset>()}
                                         match parentCode with
-                                          | "Not found" -> //printfn "Folder %s not found: Adding Folder [%s] added to %s" parentCode data root.Data; 
+                                          | "Not found" -> printfn "Folder [%s] not found: Adding Folder [%s] to %s" parentCode data root.Data; 
                                                            root.Folders.Add(newFolder)  
                                           | _ -> let parentFolder = findFolder(root, parentCode)
                                                  match parentFolder.DatabaseByThemes with
-                                                   | "databaseByThemes" -> //printfn "Parent folder not found: Adding Folder [%s] to %s" data root.Data;
+                                                   | "databaseByThemes" -> printfn "Parent folder not found: Adding Folder [%s] to %s" data root.Data;
                                                                            root.Folders.Add(newFolder)  
                                                    | _ -> //printfn "Adding Folder [%s] to %s" data parentFolder.Data;
                                                           parentFolder.Folders.Add(newFolder)  
@@ -173,8 +173,10 @@ module Tree =
     // printfn "Root Folders: %A" root.Folders
     // printfn "Searching for: %s" parentFolderName
     // printfn "ParentFolder: %A" parentFolder
-    let childFolderNames = parentFolder.Folders |> Seq.map(fun f -> f.DatabaseByThemes)  
-    childFolderNames |> Seq.toArray
+    let childFolders = parentFolder.Folders |> Seq.map(fun f -> (f.DatabaseByThemes, f.Data))  
+    let childDatasets = parentFolder.Datasets |> Seq.map(fun d -> (d.Title, d.Code))  
+    (childFolders |> Seq.toArray, childDatasets |> Seq.toArray)
+    // childFolders |> Seq.toArray
     
     
 

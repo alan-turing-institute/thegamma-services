@@ -50,8 +50,8 @@ module Domain =
     tree
   
   let getChildren (root:Folder, folderName:string) =
-    let children = getChildren(root, folderName)
-    children
+    let (childModules, childDatasets) = getChildren(root, folderName)
+    (childModules, childDatasets)
  
   
 
