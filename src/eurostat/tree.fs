@@ -64,6 +64,7 @@ module Tree =
   
   let getTypeName (x: 'T option) =
     typeof<'T>.Name          
+
   let rec findFolder (aFolder:Folder, folderCode:string)=
     if (aFolder.Data.StartsWith(folderCode)) then
       aFolder
@@ -114,7 +115,8 @@ module Tree =
       | _ -> code.[0..lastIndexOfUnderscore-1]
   
   let getParentFolderName (indexOfHead:int,databaseByThemes:string, code:string) =
-    let parentCode = getCodePrefix(code)
+    // let parentCode = getCodePrefix(code)
+    let parentCode = "Not found"
     if parentCode.Equals("Not found") then
       let numWhiteSpaces = firstNonWhiteCharIndex databaseByThemes
       //printfn "code:%s numwhitespace: %i" databaseByThemes numWhiteSpaces
@@ -165,6 +167,14 @@ module Tree =
     readLines ((branchesLines |> Seq.toList), root, root.Folders, root.Datasets)
     // printfn "Root: %A" root
     root
+  
+  let getChildren (root:Folder, parentFolderName: string) =
+    let parentFolder = findFolder(root,parentFolderName)
+    // printfn "Root Folders: %A" root.Folders
+    // printfn "Searching for: %s" parentFolderName
+    // printfn "ParentFolder: %A" parentFolder
+    let childFolderNames = parentFolder.Folders |> Seq.map(fun f -> f.DatabaseByThemes)  
+    childFolderNames |> Seq.toArray
     
     
 

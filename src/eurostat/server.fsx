@@ -34,7 +34,7 @@ let noSchema = Unchecked.defaultof<ThingSchema>
 let makeSchemaThing kind name =
   { ``@context`` = "http://schema.org/"; ``@type`` = kind; name = name }
 let makeSchemaExt kind name =
-  { ``@context`` = "http://thegamma.net/worldbank"; ``@type`` = kind; name = name }
+  { ``@context`` = "http://thegamma.net/eurostat"; ``@type`` = kind; name = name }
 
 let memberPath s f = 
   path s >=> request (fun _ -> f() |> Array.ofSeq |> toJson |> Successful.OK)
@@ -48,4 +48,22 @@ let (|Lookup|_|) k (dict:IDictionary<_,_>) =
   | _ -> None
 
 let app =
-  printfn "%A" eurostatScience
+  // printfn "%A" eurostatScience
+  choose [ 
+    memberPath "/" (fun () ->
+      [ { name="science"; returns= {kind="nested"; endpoint="/pickModule"}
+          trace=[| |]; schema = noSchema } 
+      ])
+    memberPath "/pickModule" (fun () ->
+      let rootFolderData = "scitech" 
+      let scienceModules = Domain.getChildren(eurostatScience,rootFolderData)
+      // printfn "Science Modules: %A" scienceModules
+      [ for aModule in scienceModules ->
+          { name=aModule; returns={kind="nested"; endpoint="/amodule/pickModule"}
+            } ])
+    
+
+    // path "/data" >=> request (fun r ->
+    //   let dataset = 
+    //     )
+  ]

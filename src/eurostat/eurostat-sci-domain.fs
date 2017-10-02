@@ -48,6 +48,10 @@ module Domain =
   let getTree = 
     let tree = readTree
     tree
+  
+  let getChildren (root:Folder, folderName:string) =
+    let children = getChildren(root, folderName)
+    children
  
   
 
