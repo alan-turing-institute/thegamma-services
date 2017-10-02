@@ -50,14 +50,21 @@ let (|Lookup|_|) k (dict:IDictionary<_,_>) =
 let app =
   // printfn "%A" eurostatScience
   choose [ 
+    // memberPath "/" (fun () ->
+    //   [ { name="science"; returns= {kind="nested"; endpoint="/pickModule"}
+    //       trace=[| |]; schema = noSchema } 
+    //   ])
+    // memberPath "/pickModule" (fun () ->
+    //   let rootFolderData = "scitech" 
+    //   let (scienceModules, scienceDatasets) = Domain.getChildren(eurostatScience,rootFolderData)
+    //   [ for (theme,code) in scienceModules ->
+    //       let endpointUri = sprintf "/%s/pickModule" code
+    //       { name=theme; returns={kind="nested"; endpoint=endpointUri}
+    //         trace=[| |]; schema = noSchema } ])
+
     memberPath "/" (fun () ->
-      [ { name="science"; returns= {kind="nested"; endpoint="/pickModule"}
-          trace=[| |]; schema = noSchema } 
-      ])
-    memberPath "/pickModule" (fun () ->
       let rootFolderData = "scitech" 
       let (scienceModules, scienceDatasets) = Domain.getChildren(eurostatScience,rootFolderData)
-      // printfn "Science Modules: %A" scienceModules
       [ for (theme,code) in scienceModules ->
           let endpointUri = sprintf "/%s/pickModule" code
           { name=theme; returns={kind="nested"; endpoint=endpointUri}
@@ -65,15 +72,13 @@ let app =
 
     memberPathf "/%s/pickModule" (fun rootFolderData ->
       let (scienceModules, sciencDatasets) = Domain.getChildren(eurostatScience,rootFolderData)
-      // printfn "Science Modules: %A" scienceModules
       let modulesList = [ for (theme,code) in scienceModules ->
                             let endpointUri = sprintf "/%s/pickModule" code
                             { name=theme; returns={kind="nested"; endpoint=endpointUri}
                               trace=[| |]; schema = noSchema } ]
-      modulesList)
-    
-
-    // path "/data" >=> request (fun r ->
-    //   let dataset = 
-    //     )
+      let datasetsList = [ for (theme,code) in sciencDatasets ->
+                            { name=theme; returns={kind="nested"; endpoint="/data"}
+                              trace=[|"data=" + code|]; schema = noSchema } ]
+      modulesList @ datasetsList)
+        
   ]
